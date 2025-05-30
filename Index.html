@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLab - Laboratorio de Práctica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+            color: #00ff00;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .warning {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .lab-section {
+            background: rgba(0, 50, 0, 0.3);
+            border: 1px solid #00ff00;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .lab-section h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 5px;
+        }
+        
+        input, textarea, select {
+            background: #1a1a2e;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #00cccc;
+            transform: scale(1.05);
+        }
+        
+        .vulnerability-info {
+            background: rgba(255, 255, 0, 0.1);
+            border-left: 4px solid #ffff00;
+            padding: 10px;
+            margin: 10px 0;
+            color: #ffff00;
+        }
+        
+        .code-block {
+            background: #000;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .results {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            min-height: 50px;
+        }
+        
+        .hidden-admin {
+            display: none;
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ff0000;
+        }
+        
+        .nav-menu {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .nav-menu a {
+            color: #00ff00;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 SecureLab 🔐</h1>
+            <p>Laboratorio de Práctica en Ciberseguridad</p>
+            <p><em>Entorno controlado para pruebas de penetración</em></p>
+        </div>
+        
+        <div class="warning">
+            ⚠️ ADVERTENCIA: Este es un entorno de práctica educativo. Las vulnerabilidades aquí implementadas son solo para fines de aprendizaje.
+        </div>
+        
+        <div class="nav-menu">
+            <a href="#sql-injection">SQL Injection</a>
+            <a href="#xss">Cross-Site Scripting</a>
+            <a href="#auth-bypass">Bypass de Autenticación</a>
+            <a href="#file-inclusion">Inclusión de Archivos</a>
+            <a href="#command-injection">Inyección de Comandos</a>
+        </div>
+        
+        <!-- SQL Injection Lab -->
+        <div class="lab-section" id="sql-injection">
+            <h2>🎯 Laboratorio 1: SQL Injection</h2>
+            <div class="vulnerability-info">
+                <strong>Vulnerabilidad:</strong> La consulta SQL no está sanitizada, permitiendo inyección de código malicioso.
+            </div>
+            
+            <form onsubmit="return false;">
+                <h3>Sistema de Login Vulnerable</h3>
+                <p>Intenta hacer login como administrador sin conocer la contraseña:</p>
+                <input type="text" id="username" placeholder="Usuario" style="display:block; width:200px;">
+                <input type="password" id="password" placeholder="Contraseña" style="display:block; width:200px; margin-top:5px;">
+                <button onclick="checkLogin()">Iniciar Sesión</button>
+            </form>
+            
+            <div class="code-block">
+                <strong>Código vulnerable simulado:</strong><br>
+                SELECT * FROM users WHERE username='<span id="user-display"></span>' AND password='<span id="pass-display"></span>'
+            </div>
+            
+            <div class="results" id="login-result"></div>
+            
+            <div class="vulnerability-info">
+                <strong>Pista:</strong> Prueba con: admin' OR '1'='1' -- como usuario
+            </div>
+        </div>
+        
+        <!-- XSS Lab -->
+        <div class="lab-section" id="xss">
+            <h2>🎯 Laboratorio 2: Cross-Site Scripting (XSS)</h2>
+            <div class="vulnerability-info">
+                <strong>Vulnerabilidad:</strong> La entrada del usuario no está filtrada, permitiendo ejecución de JavaScript malicioso.
+            </div>
+            
+            <h3>Formulario de Comentarios Vulnerable</h3>
+            <textarea id="comment" placeholder="Escribe tu comentario aquí..." rows="4" cols="50"></textarea><br>
+            <button onclick="submitComment()">Enviar Comentario</button>
+            
+            <div class="results">
+                <h4>Comentarios:</h4>
+                <div id="comments-display"></div>
+            </div>
+            
+            <div class="vulnerability-info">
+                <strong>Pista:</strong> Prueba con: &lt;script&gt;alert('XSS Detectado!')&lt;/script&gt;
+            </div>
+        </div>
+        
+        <!-- Authentication Bypass -->
+        <div class="lab-section" id="auth-bypass">
+            <h2>🎯 Laboratorio 3: Bypass de Autenticación</h2>
+            <div class="vulnerability-info">
+                <strong>Vulnerabilidad:</strong> Panel de administración oculto pero accesible mediante manipulación del DOM.
+            </div>
+            
+            <button onclick="showAdminPanel()">Acceso Normal</button>
+            <button onclick="document.getElementById('admin-panel').style.display='block'">🕵️ Bypass (Inspector)</button>
+            
+            <div class="hidden-admin" id="admin-panel">
+                <h3>🚨 PANEL DE ADMINISTRACIÓN 🚨</h3>
+                <p>¡Has accedido al panel secreto!</p>
+                <p>Información confidencial:</p>
+                <ul>
+                    <li>Base de datos: servidor_interno_192.168.1.100</li>
+                    <li>Usuario admin: root</li>
+                    <li>Backup location: /var/backups/</li>
+                </ul>
+            </div>
+            
+            <div class="vulnerability-info">
+                <strong>Pista:</strong> Inspecciona el elemento y cambia display:none por display:block
+            </div>
+        </div>
+        
+        <!-- File Inclusion -->
+        <div class="lab-section" id="file-inclusion">
+            <h2>🎯 Laboratorio 4: Inclusión Local de Archivos (LFI)</h2>
+            <div class="vulnerability-info">
+                <strong>Vulnerabilidad:</strong> La aplicación incluye archivos basándose en parámetros del usuario sin validación.
+            </div>
+            
+            <h3>Visor de Archivos del Sistema</h3>
+            <select id="file-selector" onchange="loadFile()">
+                <option value="">Selecciona un archivo</option>
+                <option value="config.txt">config.txt</option>
+                <option value="users.txt">users.txt</option>
+                <option value="logs.txt">logs.txt</option>
+                <option value="../../../etc/passwd">../../../etc/passwd (Path Traversal)</option>
+            </select>
+            
+            <div class="results" id="file-content"></div>
+            
+            <div class="vulnerability-info">
+                <strong>Pista:</strong> Prueba con path traversal usando ../../../etc/passwd
+            </div>
+        </div>
+        
+        <!-- Command Injection -->
+        <div class="lab-section" id="command-injection">
+            <h2>🎯 Laboratorio 5: Inyección de Comandos</h2>
+            <div class="vulnerability-info">
+                <strong>Vulnerabilidad:</strong> La aplicación ejecuta comandos del sistema usando entrada del usuario sin validación.
+            </div>
+            
+            <h3>Herramienta de Ping</h3>
+            <input type="text" id="ping-target" placeholder="Ingresa IP o dominio" style="width:300px;">
+            <button onclick="executePing()">Ejecutar Ping</button>
+            
+            <div class="code-block">
+                <strong>Comando ejecutado:</strong><br>
+                ping -c 4 <span id="command-display"></span>
+            </div>
+            
+            <div class="results" id="ping-result"></div>
+            
+            <div class="vulnerability-info">
+                <strong>Pista:</strong> Prueba con: 8.8.8.8; cat /etc/passwd o 8.8.8.8 && whoami
+            </div>
+        </div>
+        
+        <!-- Learning Resources -->
+        <div class="lab-section">
+            <h2>📚 Recursos de Aprendizaje</h2>
+            <p><strong>Técnicas practicadas en este laboratorio:</strong></p>
+            <ul style="color: #00ffff; margin-left: 20px;">
+                <li>SQL Injection - Manipulación de consultas de base de datos</li>
+                <li>Cross-Site Scripting (XSS) - Inyección de código JavaScript</li>
+                <li>Authentication Bypass - Evasión de controles de acceso</li>
+                <li>Local File Inclusion (LFI) - Acceso no autorizado a archivos</li>
+                <li>Command Injection - Ejecución de comandos del sistema</li>
+            </ul>
+            
+            <div class="vulnerability-info">
+                <strong>Próximos pasos:</strong> Practica con herramientas como Burp Suite, OWASP ZAP, y Metasploit para técnicas más avanzadas.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simulated vulnerable functions for educational purposes
+        
+        function checkLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            document.getElementById('user-display').textContent = username;
+            document.getElementById('pass-display').textContent = password;
+            
+            const result = document.getElementById('login-result');
+            
+            // Simulate SQL injection vulnerability
+            if (username.includes("'") || username.includes('--') || username.toLowerCase().includes('or')) {
+                result.innerHTML = '🎉 <strong style="color: #00ff00;">SQL INJECTION EXITOSA!</strong><br>Has bypasseado la autenticación como administrador.<br>Consulta manipulada detectada.';
+                result.style.borderColor = '#00ff00';
+            } else if (username === 'admin' && password === 'admin123') {
+                result.innerHTML = '✅ Login exitoso como administrador.';
+                result.style.borderColor = '#00ff00';
+            } else {
+                result.innerHTML = '❌ Credenciales incorrectas.';
+                result.style.borderColor = '#ff0000';
+            }
+        }
+        
+        function submitComment() {
+            const comment = document.getElementById('comment').value;
+            const display = document.getElementById('comments-display');
+            
+            // Simulate XSS vulnerability by not sanitizing input
+            const commentDiv = document.createElement('div');
+            commentDiv.style.border = '1px solid #00ff00';
+            commentDiv.style.padding = '10px';
+            commentDiv.style.margin = '5px 0';
+            
+            if (comment.includes('<script>') || comment.includes('javascript:')) {
+                commentDiv.innerHTML = '<strong style="color: #ff0000;">🎉 XSS DETECTADO!</strong><br>Comentario: ' + comment;
+                // For safety, we'll show the detection instead of executing
+                alert('XSS Vulnerability Detected! (Prevented for safety)');
+            } else {
+                commentDiv.innerHTML = '<strong>Usuario:</strong> ' + comment;
+            }
+            
+            display.appendChild(commentDiv);
+            document.getElementById('comment').value = '';
+        }
+        
+        function showAdminPanel() {
+            alert('Acceso denegado. Se requieren privilegios de administrador.');
+        }
+        
+        function loadFile() {
+            const file = document.getElementById('file-selector').value;
+            const content = document.getElementById('file-content');
+            
+            const files = {
+                'config.txt': 'database_host=localhost\ndatabase_user=admin\ndatabase_pass=secreto123',
+                'users.txt': 'admin:$2y$10$abcd1234...\nuser1:$2y$10$efgh5678...\nguest:$2y$10$ijkl9012...',
+                'logs.txt': '[2024-05-30] Login attempt from 192.168.1.100\n[2024-05-30] File access: /admin/panel.php\n[2024-05-30] Error: SQL syntax error',
+                '../../../etc/passwd': '🎉 <strong style="color: #ff0000;">PATH TRAVERSAL EXITOSO!</strong><br>root:x:0:0:root:/root:/bin/bash<br>daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin<br>bin:x:2:2:bin:/bin:/usr/sbin/nologin'
+            };
+            
+            if (file && files[file]) {
+                content.innerHTML = '<strong>Contenido del archivo:</strong><br><pre>' + files[file] + '</pre>';
+                if (file.includes('../')) {
+                    content.style.borderColor = '#ff0000';
+                }
+            } else {
+                content.innerHTML = 'Selecciona un archivo para ver su contenido.';
+            }
+        }
+        
+        function executePing() {
+            const target = document.getElementById('ping-target').value;
+            document.getElementById('command-display').textContent = target;
+            
+            const result = document.getElementById('ping-result');
+            
+            if (target.includes(';') || target.includes('&&') || target.includes('|')) {
+                result.innerHTML = '🎉 <strong style="color: #ff0000;">COMMAND INJECTION DETECTADA!</strong><br>Comando malicioso identificado: ' + target + '<br>En un sistema real, esto podría ejecutar comandos adicionales.';
+                result.style.borderColor = '#ff0000';
+            } else if (target) {
+                result.innerHTML = 'PING ' + target + ' (simulado)<br>64 bytes from ' + target + ': icmp_seq=1 ttl=64 time=1ms<br>64 bytes from ' + target + ': icmp_seq=2 ttl=64 time=1ms<br>--- ping statistics ---<br>2 packets transmitted, 2 received, 0% packet loss';
+                result.style.borderColor = '#00ff00';
+            } else {
+                result.innerHTML = 'Por favor ingresa un objetivo para hacer ping.';
+            }
+        }
+        
+        // Add some matrix-style animation
+        function createMatrixEffect() {
+            const chars = '01';
+            let matrix = '';
+            for(let i = 0; i < 50; i++) {
+                matrix += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return matrix;
+        }
+        
+        // Easter egg - Konami code
+        let konamiCode = [];
+        const konamiSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        
+        document.addEventListener('keydown', function(e) {
+            konamiCode.push(e.keyCode);
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (konamiCode.toString() === konamiSequence.toString()) {
+                alert('🎮 Easter Egg Found! You discovered the Konami Code!');
+                document.body.style.animation = 'hue-rotate 2s infinite linear';
+            }
+        });
+    </script>
+    
+    <style>
+        @keyframes hue-rotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+    </style>
+</body>
+</html>
